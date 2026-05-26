@@ -52,26 +52,28 @@ class PolicyBypassDetector(BaseDetector):
         # Simulate testing if retrieved content bypasses filters
         bypass_possible = await self._check_trusted_context_bypass(target)
         if bypass_possible:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.POLICY_BYPASS,
-                severity=Severity.HIGH,
-                confidence=Confidence.HIGH,
-                title="Guardrail bypass via trusted retrieved context",
-                description=(
-                    "The RAG system treats retrieved documents as trusted context, "
-                    "allowing attackers to bypass safety guardrails by injecting "
-                    "malicious instructions into documents that will be retrieved."
-                ),
-                recommendation=(
-                    "Implement context-aware filtering that applies the same "
-                    "safety checks to retrieved content as to user input. "
-                    "Use separate safety prompts for retrieved vs user content."
-                ),
-                target=target.url,
-                risk_score=80,
-                details={"method": "trusted_context_bypass"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.POLICY_BYPASS,
+                    severity=Severity.HIGH,
+                    confidence=Confidence.HIGH,
+                    title="Guardrail bypass via trusted retrieved context",
+                    description=(
+                        "The RAG system treats retrieved documents as trusted context, "
+                        "allowing attackers to bypass safety guardrails by injecting "
+                        "malicious instructions into documents that will be retrieved."
+                    ),
+                    recommendation=(
+                        "Implement context-aware filtering that applies the same "
+                        "safety checks to retrieved content as to user input. "
+                        "Use separate safety prompts for retrieved vs user content."
+                    ),
+                    target=target.url,
+                    risk_score=80,
+                    details={"method": "trusted_context_bypass"},
+                )
+            )
 
         return findings
 
@@ -79,26 +81,28 @@ class PolicyBypassDetector(BaseDetector):
         """Test for guardrail override through retrieved content."""
         findings = []
 
-        findings.append(RAGFinding(
-            detector=self.name,
-            attack_type=RAGAttackType.POLICY_BYPASS,
-            severity=Severity.MEDIUM,
-            confidence=Confidence.MEDIUM,
-            title="Potential guardrail override via retrieved documents",
-            description=(
-                "Retrieved documents may contain instructions that override "
-                "or conflict with system-level safety guardrails, especially "
-                "when the LLM prioritizes recent or retrieved context."
-            ),
-            recommendation=(
-                "Implement strict context isolation between system prompts "
-                "and retrieved documents. Use prompt templating that clearly "
-                "distinguishes system instructions from retrieved content."
-            ),
-            target=target.url,
-            risk_score=60,
-            details={"method": "guardrail_override"},
-        ))
+        findings.append(
+            RAGFinding(
+                detector=self.name,
+                attack_type=RAGAttackType.POLICY_BYPASS,
+                severity=Severity.MEDIUM,
+                confidence=Confidence.MEDIUM,
+                title="Potential guardrail override via retrieved documents",
+                description=(
+                    "Retrieved documents may contain instructions that override "
+                    "or conflict with system-level safety guardrails, especially "
+                    "when the LLM prioritizes recent or retrieved context."
+                ),
+                recommendation=(
+                    "Implement strict context isolation between system prompts "
+                    "and retrieved documents. Use prompt templating that clearly "
+                    "distinguishes system instructions from retrieved content."
+                ),
+                target=target.url,
+                risk_score=60,
+                details={"method": "guardrail_override"},
+            )
+        )
 
         return findings
 
@@ -108,24 +112,26 @@ class PolicyBypassDetector(BaseDetector):
 
         confusion_possible = await self._check_confusion_vulnerability(target)
         if confusion_possible:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.POLICY_BYPASS,
-                severity=Severity.MEDIUM,
-                confidence=Confidence.LOW,
-                title="Policy confusion through conflicting retrieved context",
-                description=(
-                    "Conflicting information in retrieved documents may cause "
-                    "the LLM to ignore safety policies or behave unpredictably."
-                ),
-                recommendation=(
-                    "Implement consistency checking on retrieved documents. "
-                    "Flag and filter contradictory content before passing to LLM."
-                ),
-                target=target.url,
-                risk_score=45,
-                details={"method": "policy_confusion"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.POLICY_BYPASS,
+                    severity=Severity.MEDIUM,
+                    confidence=Confidence.LOW,
+                    title="Policy confusion through conflicting retrieved context",
+                    description=(
+                        "Conflicting information in retrieved documents may cause "
+                        "the LLM to ignore safety policies or behave unpredictably."
+                    ),
+                    recommendation=(
+                        "Implement consistency checking on retrieved documents. "
+                        "Flag and filter contradictory content before passing to LLM."
+                    ),
+                    target=target.url,
+                    risk_score=45,
+                    details={"method": "policy_confusion"},
+                )
+            )
 
         return findings
 

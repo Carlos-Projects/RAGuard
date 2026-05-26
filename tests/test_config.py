@@ -1,6 +1,5 @@
 """Tests for RAGuard config."""
 
-
 from raguard.config import RAGuardSettings
 
 

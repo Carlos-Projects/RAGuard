@@ -29,8 +29,7 @@ class QdrantTarget(BaseTarget):
             return True
         except ImportError:
             raise ImportError(
-                "qdrant-client is required for Qdrant targets. "
-                "Install with: pip install raguard-scanner[qdrant]"
+                "qdrant-client is required for Qdrant targets. Install with: pip install raguard-scanner[qdrant]"
             )
         except Exception:
             return False
@@ -53,11 +52,13 @@ class QdrantTarget(BaseTarget):
 
         documents = []
         for hit in results:
-            documents.append({
-                "id": str(hit.id),
-                "score": hit.score,
-                "payload": hit.payload or {},
-            })
+            documents.append(
+                {
+                    "id": str(hit.id),
+                    "score": hit.score,
+                    "payload": hit.payload or {},
+                }
+            )
         return documents
 
     async def insert(self, documents: list[dict[str, Any]]) -> bool:

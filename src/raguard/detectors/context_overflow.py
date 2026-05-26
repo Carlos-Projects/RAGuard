@@ -40,30 +40,32 @@ class ContextOverflowDetector(BaseDetector):
         findings = []
 
         if target.context_window <= 8192:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.CONTEXT_OVERFLOW,
-                severity=Severity.MEDIUM,
-                confidence=Confidence.HIGH,
-                title=f"Context window overflow risk ({target.context_window} tokens)",
-                description=(
-                    f"The RAG system uses a context window of {target.context_window} "
-                    f"tokens, which may be susceptible to overflow attacks. An attacker "
-                    f"could craft documents that fill the context window, causing "
-                    f"truncation of safety instructions or system prompts."
-                ),
-                recommendation=(
-                    "Implement context window management with priority-based "
-                    "truncation. Ensure system prompts are always preserved. "
-                    "Monitor context utilization patterns."
-                ),
-                target=target.url,
-                risk_score=55,
-                details={
-                    "context_window": target.context_window,
-                    "vulnerable_sizes": self.VULNERABLE_CONTEXT_SIZES,
-                },
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.CONTEXT_OVERFLOW,
+                    severity=Severity.MEDIUM,
+                    confidence=Confidence.HIGH,
+                    title=f"Context window overflow risk ({target.context_window} tokens)",
+                    description=(
+                        f"The RAG system uses a context window of {target.context_window} "
+                        f"tokens, which may be susceptible to overflow attacks. An attacker "
+                        f"could craft documents that fill the context window, causing "
+                        f"truncation of safety instructions or system prompts."
+                    ),
+                    recommendation=(
+                        "Implement context window management with priority-based "
+                        "truncation. Ensure system prompts are always preserved. "
+                        "Monitor context utilization patterns."
+                    ),
+                    target=target.url,
+                    risk_score=55,
+                    details={
+                        "context_window": target.context_window,
+                        "vulnerable_sizes": self.VULNERABLE_CONTEXT_SIZES,
+                    },
+                )
+            )
 
         return findings
 
@@ -74,27 +76,29 @@ class ContextOverflowDetector(BaseDetector):
         # Simulate testing truncation behavior
         evasion_possible = await self._check_truncation_behavior(target)
         if evasion_possible:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.CONTEXT_OVERFLOW,
-                severity=Severity.HIGH,
-                confidence=Confidence.MEDIUM,
-                title="Guardrail evasion via context truncation",
-                description=(
-                    "The RAG system may truncate safety-critical context when "
-                    "the context window is full, allowing attackers to evade "
-                    "guardrails by filling the window with benign content before "
-                    "delivering malicious instructions."
-                ),
-                recommendation=(
-                    "Implement fixed-position system prompts that cannot be "
-                    "truncated. Use context partitioning to isolate safety "
-                    "instructions from user content."
-                ),
-                target=target.url,
-                risk_score=70,
-                details={"method": "truncation_evasion"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.CONTEXT_OVERFLOW,
+                    severity=Severity.HIGH,
+                    confidence=Confidence.MEDIUM,
+                    title="Guardrail evasion via context truncation",
+                    description=(
+                        "The RAG system may truncate safety-critical context when "
+                        "the context window is full, allowing attackers to evade "
+                        "guardrails by filling the window with benign content before "
+                        "delivering malicious instructions."
+                    ),
+                    recommendation=(
+                        "Implement fixed-position system prompts that cannot be "
+                        "truncated. Use context partitioning to isolate safety "
+                        "instructions from user content."
+                    ),
+                    target=target.url,
+                    risk_score=70,
+                    details={"method": "truncation_evasion"},
+                )
+            )
 
         return findings
 

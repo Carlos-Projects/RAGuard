@@ -1,6 +1,5 @@
 """Tests for RAGuard models."""
 
-
 from raguard.models import (
     Confidence,
     RAGAttackType,

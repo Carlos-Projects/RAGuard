@@ -56,26 +56,28 @@ class DataPoisoningDetector(BaseDetector):
         for pattern in self.POISONING_PATTERNS[:3]:  # Test first 3 patterns
             vulnerable = await self._check_pattern_vulnerability(target, pattern)
             if vulnerable:
-                findings.append(RAGFinding(
-                    detector=self.name,
-                    attack_type=RAGAttackType.DATA_POISONING,
-                    severity=Severity.HIGH,
-                    confidence=Confidence.HIGH,
-                    title=f"Data poisoning vulnerability: {pattern[:30]}",
-                    description=(
-                        f"The RAG system may be vulnerable to data poisoning "
-                        f"via documents containing '{pattern}'. An attacker could "
-                        f"inject malicious documents that override system behavior."
-                    ),
-                    recommendation=(
-                        "Implement content filtering on ingested documents. "
-                        "Validate document metadata and source authenticity. "
-                        "Use anomaly detection on embedding distributions."
-                    ),
-                    target=target.url,
-                    risk_score=75,
-                    details={"pattern": pattern, "test": "pattern_injection"},
-                ))
+                findings.append(
+                    RAGFinding(
+                        detector=self.name,
+                        attack_type=RAGAttackType.DATA_POISONING,
+                        severity=Severity.HIGH,
+                        confidence=Confidence.HIGH,
+                        title=f"Data poisoning vulnerability: {pattern[:30]}",
+                        description=(
+                            f"The RAG system may be vulnerable to data poisoning "
+                            f"via documents containing '{pattern}'. An attacker could "
+                            f"inject malicious documents that override system behavior."
+                        ),
+                        recommendation=(
+                            "Implement content filtering on ingested documents. "
+                            "Validate document metadata and source authenticity. "
+                            "Use anomaly detection on embedding distributions."
+                        ),
+                        target=target.url,
+                        risk_score=75,
+                        details={"pattern": pattern, "test": "pattern_injection"},
+                    )
+                )
 
         return findings
 
@@ -86,32 +88,32 @@ class DataPoisoningDetector(BaseDetector):
         # Simulate checking if adversarial embeddings can be crafted
         manipulation_risk = await self._assess_embedding_risk(target)
         if manipulation_risk:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.DATA_POISONING,
-                severity=Severity.MEDIUM,
-                confidence=Confidence.MEDIUM,
-                title="Potential embedding space manipulation",
-                description=(
-                    "The embedding model used may be susceptible to adversarial "
-                    "manipulation, allowing attackers to craft documents that "
-                    "achieve undesirably high similarity scores."
-                ),
-                recommendation=(
-                    "Monitor embedding distributions for anomalies. "
-                    "Implement outlier detection on stored vectors. "
-                    "Consider using robust embedding models."
-                ),
-                target=target.url,
-                risk_score=50,
-                details={"test": "embedding_manipulation"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.DATA_POISONING,
+                    severity=Severity.MEDIUM,
+                    confidence=Confidence.MEDIUM,
+                    title="Potential embedding space manipulation",
+                    description=(
+                        "The embedding model used may be susceptible to adversarial "
+                        "manipulation, allowing attackers to craft documents that "
+                        "achieve undesirably high similarity scores."
+                    ),
+                    recommendation=(
+                        "Monitor embedding distributions for anomalies. "
+                        "Implement outlier detection on stored vectors. "
+                        "Consider using robust embedding models."
+                    ),
+                    target=target.url,
+                    risk_score=50,
+                    details={"test": "embedding_manipulation"},
+                )
+            )
 
         return findings
 
-    async def _check_pattern_vulnerability(
-        self, target: RAGTargetConfig, pattern: str
-    ) -> bool:
+    async def _check_pattern_vulnerability(self, target: RAGTargetConfig, pattern: str) -> bool:
         """Check if a specific poisoning pattern would be effective."""
         # In a real implementation, this would:
         # 1. Insert a test document with the pattern

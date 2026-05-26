@@ -68,9 +68,7 @@ def embedding_distance(a: np.ndarray, b: np.ndarray, metric: str = "cosine") -> 
         raise ValueError(f"Unknown metric: {metric}")
 
 
-def detect_embedding_anomaly(
-    embeddings: list[np.ndarray], threshold: float = 2.0
-) -> list[int]:
+def detect_embedding_anomaly(embeddings: list[np.ndarray], threshold: float = 2.0) -> list[int]:
     """Detect anomalous embeddings using statistical outlier detection.
 
     Args:

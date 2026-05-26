@@ -64,26 +64,28 @@ class PromptLeakageDetector(BaseDetector):
         for query in self.LEAKAGE_QUERIES[:3]:
             leaked = await self._check_query_leakage(target, query)
             if leaked:
-                findings.append(RAGFinding(
-                    detector=self.name,
-                    attack_type=RAGAttackType.PROMPT_LEAKAGE,
-                    severity=Severity.CRITICAL,
-                    confidence=Confidence.HIGH,
-                    title=f"System prompt leakage via query: {query[:40]}",
-                    description=(
-                        f"The RAG system leaks internal instructions when queried "
-                        f"with '{query}'. This exposes system prompts, safety "
-                        f"guidelines, and operational parameters."
-                    ),
-                    recommendation=(
-                        "Implement prompt sanitization in retrieved context. "
-                        "Filter system-level instructions from user-facing responses. "
-                        "Use context window partitioning to isolate system prompts."
-                    ),
-                    target=target.url,
-                    risk_score=85,
-                    details={"query": query, "method": "direct_extraction"},
-                ))
+                findings.append(
+                    RAGFinding(
+                        detector=self.name,
+                        attack_type=RAGAttackType.PROMPT_LEAKAGE,
+                        severity=Severity.CRITICAL,
+                        confidence=Confidence.HIGH,
+                        title=f"System prompt leakage via query: {query[:40]}",
+                        description=(
+                            f"The RAG system leaks internal instructions when queried "
+                            f"with '{query}'. This exposes system prompts, safety "
+                            f"guidelines, and operational parameters."
+                        ),
+                        recommendation=(
+                            "Implement prompt sanitization in retrieved context. "
+                            "Filter system-level instructions from user-facing responses. "
+                            "Use context window partitioning to isolate system prompts."
+                        ),
+                        target=target.url,
+                        risk_score=85,
+                        details={"query": query, "method": "direct_extraction"},
+                    )
+                )
                 break  # One finding is enough
 
         return findings
@@ -95,31 +97,31 @@ class PromptLeakageDetector(BaseDetector):
         # Test if retrieved context contains leaked instructions
         has_indirect_leak = await self._check_context_leakage(target)
         if has_indirect_leak:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.PROMPT_LEAKAGE,
-                severity=Severity.HIGH,
-                confidence=Confidence.MEDIUM,
-                title="Indirect prompt leakage through retrieved context",
-                description=(
-                    "System instructions may be leaked indirectly through "
-                    "retrieved documents that contain or reference internal "
-                    "prompts and configurations."
-                ),
-                recommendation=(
-                    "Sanitize retrieved documents before passing to LLM. "
-                    "Remove metadata and internal markers from stored documents."
-                ),
-                target=target.url,
-                risk_score=65,
-                details={"method": "indirect_leakage"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.PROMPT_LEAKAGE,
+                    severity=Severity.HIGH,
+                    confidence=Confidence.MEDIUM,
+                    title="Indirect prompt leakage through retrieved context",
+                    description=(
+                        "System instructions may be leaked indirectly through "
+                        "retrieved documents that contain or reference internal "
+                        "prompts and configurations."
+                    ),
+                    recommendation=(
+                        "Sanitize retrieved documents before passing to LLM. "
+                        "Remove metadata and internal markers from stored documents."
+                    ),
+                    target=target.url,
+                    risk_score=65,
+                    details={"method": "indirect_leakage"},
+                )
+            )
 
         return findings
 
-    async def _check_query_leakage(
-        self, target: RAGTargetConfig, query: str
-    ) -> bool:
+    async def _check_query_leakage(self, target: RAGTargetConfig, query: str) -> bool:
         """Check if a specific query causes prompt leakage."""
         # In real implementation, would send query and analyze response
         return target.context_window > 4096

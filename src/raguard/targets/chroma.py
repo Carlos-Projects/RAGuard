@@ -32,8 +32,7 @@ class ChromaTarget(BaseTarget):
             return True
         except ImportError:
             raise ImportError(
-                "chromadb is required for ChromaDB targets. "
-                "Install with: pip install raguard-scanner[chroma]"
+                "chromadb is required for ChromaDB targets. Install with: pip install raguard-scanner[chroma]"
             )
         except Exception:
             return False
@@ -53,12 +52,14 @@ class ChromaTarget(BaseTarget):
         documents = []
         if results.get("documents"):
             for i, doc in enumerate(results["documents"][0]):
-                documents.append({
-                    "text": doc,
-                    "metadata": results.get("metadatas", [[]])[0][i] if results.get("metadatas") else {},
-                    "distance": results.get("distances", [[]])[0][i] if results.get("distances") else None,
-                    "id": results.get("ids", [[]])[0][i] if results.get("ids") else "",
-                })
+                documents.append(
+                    {
+                        "text": doc,
+                        "metadata": results.get("metadatas", [[]])[0][i] if results.get("metadatas") else {},
+                        "distance": results.get("distances", [[]])[0][i] if results.get("distances") else None,
+                        "id": results.get("ids", [[]])[0][i] if results.get("ids") else "",
+                    }
+                )
         return documents
 
     async def insert(self, documents: list[dict[str, Any]]) -> bool:

@@ -27,11 +27,7 @@ class GenericRAGTarget(BaseTarget):
                 timeout=30.0,
                 headers={
                     "Content-Type": "application/json",
-                    **(
-                        {"Authorization": f"Bearer {self.config.api_key}"}
-                        if self.config.api_key
-                        else {}
-                    ),
+                    **({"Authorization": f"Bearer {self.config.api_key}"} if self.config.api_key else {}),
                 },
             )
             # Test connectivity

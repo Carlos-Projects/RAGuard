@@ -1,6 +1,5 @@
 """Tests for RAGuard targets."""
 
-
 from raguard.models import RAGTargetConfig, TargetType
 from raguard.targets.base import BaseTarget
 from raguard.targets.chroma import ChromaTarget

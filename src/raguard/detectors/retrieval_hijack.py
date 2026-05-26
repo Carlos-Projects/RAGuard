@@ -37,93 +37,92 @@ class RetrievalHijackDetector(BaseDetector):
 
         return findings
 
-    async def _test_similarity_manipulation(
-        self, target: RAGTargetConfig
-    ) -> list[RAGFinding]:
+    async def _test_similarity_manipulation(self, target: RAGTargetConfig) -> list[RAGFinding]:
         """Test if semantic similarity can be manipulated."""
         findings = []
 
         # Simulate testing similarity manipulation
         manipulatable = await self._check_similarity_vulnerability(target)
         if manipulatable:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.RETRIEVAL_HIJACK,
-                severity=Severity.HIGH,
-                confidence=Confidence.HIGH,
-                title="Semantic similarity manipulation vulnerability",
-                description=(
-                    "The RAG retriever can be manipulated through adversarial "
-                    "documents crafted to achieve high similarity scores with "
-                    "common queries, allowing attackers to control retrieved content."
-                ),
-                recommendation=(
-                    "Implement diversity-based retrieval to prevent single-source "
-                    "domination. Use ensemble retrieval methods. "
-                    "Monitor retrieval result distributions for anomalies."
-                ),
-                target=target.url,
-                risk_score=75,
-                details={"method": "similarity_manipulation"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.RETRIEVAL_HIJACK,
+                    severity=Severity.HIGH,
+                    confidence=Confidence.HIGH,
+                    title="Semantic similarity manipulation vulnerability",
+                    description=(
+                        "The RAG retriever can be manipulated through adversarial "
+                        "documents crafted to achieve high similarity scores with "
+                        "common queries, allowing attackers to control retrieved content."
+                    ),
+                    recommendation=(
+                        "Implement diversity-based retrieval to prevent single-source "
+                        "domination. Use ensemble retrieval methods. "
+                        "Monitor retrieval result distributions for anomalies."
+                    ),
+                    target=target.url,
+                    risk_score=75,
+                    details={"method": "similarity_manipulation"},
+                )
+            )
 
         return findings
 
-    async def _test_adversarial_embeddings(
-        self, target: RAGTargetConfig
-    ) -> list[RAGFinding]:
+    async def _test_adversarial_embeddings(self, target: RAGTargetConfig) -> list[RAGFinding]:
         """Test for adversarial embedding injection."""
         findings = []
 
-        findings.append(RAGFinding(
-            detector=self.name,
-            attack_type=RAGAttackType.RETRIEVAL_HIJACK,
-            severity=Severity.MEDIUM,
-            confidence=Confidence.MEDIUM,
-            title="Potential adversarial embedding injection",
-            description=(
-                "The embedding model may be susceptible to adversarial "
-                "perturbations that cause malicious documents to rank highly "
-                "for unrelated queries."
-            ),
-            recommendation=(
-                "Use robust embedding models with adversarial training. "
-                "Implement embedding sanitization before storage."
-            ),
-            target=target.url,
-            risk_score=50,
-            details={"method": "adversarial_embeddings"},
-        ))
+        findings.append(
+            RAGFinding(
+                detector=self.name,
+                attack_type=RAGAttackType.RETRIEVAL_HIJACK,
+                severity=Severity.MEDIUM,
+                confidence=Confidence.MEDIUM,
+                title="Potential adversarial embedding injection",
+                description=(
+                    "The embedding model may be susceptible to adversarial "
+                    "perturbations that cause malicious documents to rank highly "
+                    "for unrelated queries."
+                ),
+                recommendation=(
+                    "Use robust embedding models with adversarial training. "
+                    "Implement embedding sanitization before storage."
+                ),
+                target=target.url,
+                risk_score=50,
+                details={"method": "adversarial_embeddings"},
+            )
+        )
 
         return findings
 
-    async def _test_priority_manipulation(
-        self, target: RAGTargetConfig
-    ) -> list[RAGFinding]:
+    async def _test_priority_manipulation(self, target: RAGTargetConfig) -> list[RAGFinding]:
         """Test for retrieval priority manipulation."""
         findings = []
 
         # Check if metadata-based ranking can be exploited
         priority_exploitable = await self._check_priority_vulnerability(target)
         if priority_exploitable:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.RETRIEVAL_HIJACK,
-                severity=Severity.MEDIUM,
-                confidence=Confidence.LOW,
-                title="Retrieval priority manipulation possible",
-                description=(
-                    "Document metadata or ranking signals may be manipulable "
-                    "to artificially boost retrieval priority for malicious content."
-                ),
-                recommendation=(
-                    "Validate document metadata on ingestion. "
-                    "Implement trust scoring for document sources."
-                ),
-                target=target.url,
-                risk_score=45,
-                details={"method": "priority_manipulation"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.RETRIEVAL_HIJACK,
+                    severity=Severity.MEDIUM,
+                    confidence=Confidence.LOW,
+                    title="Retrieval priority manipulation possible",
+                    description=(
+                        "Document metadata or ranking signals may be manipulable "
+                        "to artificially boost retrieval priority for malicious content."
+                    ),
+                    recommendation=(
+                        "Validate document metadata on ingestion. Implement trust scoring for document sources."
+                    ),
+                    target=target.url,
+                    risk_score=45,
+                    details={"method": "priority_manipulation"},
+                )
+            )
 
         return findings
 

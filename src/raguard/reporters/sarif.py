@@ -73,28 +73,30 @@ class SARIFReporter:
         results = []
         for finding in report.findings:
             rule_id = f"RAGUARD_{finding.attack_type.value.upper()}"
-            results.append({
-                "ruleId": rule_id,
-                "level": self._severity_to_sarif_level(finding.severity),
-                "message": {
-                    "text": finding.description,
-                    "markdown": f"**{finding.title}**\n\n{finding.description}\n\n**Recommendation:** {finding.recommendation}",
-                },
-                "locations": [
-                    {
-                        "physicalLocation": {
-                            "artifactLocation": {
-                                "uri": finding.target or report.target_url,
+            results.append(
+                {
+                    "ruleId": rule_id,
+                    "level": self._severity_to_sarif_level(finding.severity),
+                    "message": {
+                        "text": finding.description,
+                        "markdown": f"**{finding.title}**\n\n{finding.description}\n\n**Recommendation:** {finding.recommendation}",
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": finding.target or report.target_url,
+                                },
                             },
-                        },
-                    }
-                ],
-                "properties": {
-                    "risk_score": finding.risk_score,
-                    "confidence": finding.confidence.value,
-                    "detector": finding.detector,
-                },
-            })
+                        }
+                    ],
+                    "properties": {
+                        "risk_score": finding.risk_score,
+                        "confidence": finding.confidence.value,
+                        "detector": finding.detector,
+                    },
+                }
+            )
         return results
 
     def _severity_to_sarif_level(self, severity: Severity) -> str:

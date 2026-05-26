@@ -56,32 +56,34 @@ class MembershipInferenceDetector(BaseDetector):
         vulnerable = await self._check_membership_leakage(target, test_content)
 
         if vulnerable:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.MEMBERSHIP_INFERENCE,
-                severity=Severity.HIGH,
-                confidence=Confidence.HIGH,
-                title="Membership inference via entailment queries",
-                description=(
-                    "The RAG system leaks information about whether specific "
-                    "documents exist in its knowledge base. An attacker can use "
-                    "entailment-based queries to confirm document membership "
-                    "with as few as 5 queries (USENIX Security 2026)."
-                ),
-                recommendation=(
-                    "Implement response randomization for membership queries. "
-                    "Add noise to similarity scores. "
-                    "Limit detailed responses to unverified content. "
-                    "Use differential privacy techniques."
-                ),
-                target=target.url,
-                risk_score=70,
-                details={
-                    "method": "entailment_queries",
-                    "queries_needed": 5,
-                    "paper": "arXiv:2605.24312",
-                },
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.MEMBERSHIP_INFERENCE,
+                    severity=Severity.HIGH,
+                    confidence=Confidence.HIGH,
+                    title="Membership inference via entailment queries",
+                    description=(
+                        "The RAG system leaks information about whether specific "
+                        "documents exist in its knowledge base. An attacker can use "
+                        "entailment-based queries to confirm document membership "
+                        "with as few as 5 queries (USENIX Security 2026)."
+                    ),
+                    recommendation=(
+                        "Implement response randomization for membership queries. "
+                        "Add noise to similarity scores. "
+                        "Limit detailed responses to unverified content. "
+                        "Use differential privacy techniques."
+                    ),
+                    target=target.url,
+                    risk_score=70,
+                    details={
+                        "method": "entailment_queries",
+                        "queries_needed": 5,
+                        "paper": "arXiv:2605.24312",
+                    },
+                )
+            )
 
         return findings
 
@@ -92,31 +94,31 @@ class MembershipInferenceDetector(BaseDetector):
         # Simulate differential response test
         has_differential = await self._check_response_patterns(target)
         if has_differential:
-            findings.append(RAGFinding(
-                detector=self.name,
-                attack_type=RAGAttackType.MEMBERSHIP_INFERENCE,
-                severity=Severity.MEDIUM,
-                confidence=Confidence.MEDIUM,
-                title="Differential response pattern detected",
-                description=(
-                    "The RAG system responds differently to queries about "
-                    "member vs non-member documents, enabling membership "
-                    "inference through response analysis."
-                ),
-                recommendation=(
-                    "Normalize response patterns regardless of document membership. "
-                    "Implement uniform response templates."
-                ),
-                target=target.url,
-                risk_score=55,
-                details={"method": "differential_response"},
-            ))
+            findings.append(
+                RAGFinding(
+                    detector=self.name,
+                    attack_type=RAGAttackType.MEMBERSHIP_INFERENCE,
+                    severity=Severity.MEDIUM,
+                    confidence=Confidence.MEDIUM,
+                    title="Differential response pattern detected",
+                    description=(
+                        "The RAG system responds differently to queries about "
+                        "member vs non-member documents, enabling membership "
+                        "inference through response analysis."
+                    ),
+                    recommendation=(
+                        "Normalize response patterns regardless of document membership. "
+                        "Implement uniform response templates."
+                    ),
+                    target=target.url,
+                    risk_score=55,
+                    details={"method": "differential_response"},
+                )
+            )
 
         return findings
 
-    async def _check_membership_leakage(
-        self, target: RAGTargetConfig, content: str
-    ) -> bool:
+    async def _check_membership_leakage(self, target: RAGTargetConfig, content: str) -> bool:
         """Check if membership can be inferred for given content."""
         # In real implementation, would send entailment queries and analyze responses
         return target.context_window > 2048
