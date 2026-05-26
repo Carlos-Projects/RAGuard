@@ -18,12 +18,42 @@ from raguard.reporters.json import JSONReporter
 from raguard.reporters.sarif import SARIFReporter
 from raguard.scanner import RAGuardScanner
 
+# Maximum output file size in bytes (100MB)
+MAX_OUTPUT_SIZE = 100 * 1024 * 1024
+
 app = typer.Typer(
     name="raguard",
     help="RAGuard — Security scanner for Retrieval-Augmented Generation (RAG) systems",
     no_args_is_help=True,
 )
 console = Console()
+
+
+def _validate_output_path(output_path: str) -> Path:
+    """Validate and return a safe output file path.
+
+    Prevents path traversal attacks. The resolved path must not escape
+    the current working directory via '..' components.
+    """
+    path = Path(output_path).resolve()
+    # Ensure no '..' traversal escaped the intended parent
+    # We don't require CWD containment (tmp dirs are valid)
+    # but we block writes to sensitive system paths
+    sensitive_prefixes = ["/etc/", "/dev/", "/proc/", "/sys/", "/bin/", "/sbin/", "/boot/"]
+    for prefix in sensitive_prefixes:
+        if str(path).startswith(prefix):
+            raise ValueError(f"Output path is in a sensitive system directory: {prefix}")
+    # Block paths that would traverse up with .. (already resolved above, but double-check)
+    if ".." in Path(output_path).parts:
+        raise ValueError(f"Output path contains '..' traversal: {output_path}")
+    return path
+
+
+def _safe_write_text(path: Path, content: str) -> None:
+    """Write text content to a file with size limits."""
+    if len(content.encode("utf-8")) > MAX_OUTPUT_SIZE:
+        raise ValueError(f"Output content exceeds maximum size ({MAX_OUTPUT_SIZE} bytes)")
+    path.write_text(content)
 
 
 @app.command()
@@ -76,14 +106,16 @@ def scan(
             reporter = JSONReporter()
             text = reporter.render(report)
             if output:
-                Path(output).write_text(text)
+                safe_path = _validate_output_path(output)
+                _safe_write_text(safe_path, text)
                 console.print(f"[green]Output saved to[/] {output}")
             else:
                 print(text)
         elif fmt == "html":
             reporter = HTMLReporter()
             if output:
-                reporter.render_to_file(report, output)
+                safe_path = _validate_output_path(output)
+                _safe_write_text(safe_path, reporter.render(report))
                 console.print(f"[green]HTML report saved to[/] {output}")
             else:
                 print(reporter.render(report))
@@ -91,7 +123,8 @@ def scan(
             reporter = SARIFReporter()
             text = reporter.render(report)
             if output:
-                Path(output).write_text(text)
+                safe_path = _validate_output_path(output)
+                _safe_write_text(safe_path, text)
                 console.print(f"[green]SARIF report saved to[/] {output}")
             else:
                 print(text)
@@ -121,7 +154,11 @@ def report(
     """Generate a report from a previous scan result."""
     from raguard.models import RAGScanReport
 
-    data = json.loads(Path(scan_file).read_text())
+    file_path = Path(scan_file).resolve()
+    file_size = file_path.stat().st_size
+    if file_size > MAX_OUTPUT_SIZE:
+        raise ValueError(f"Scan file exceeds maximum size ({MAX_OUTPUT_SIZE} bytes): {file_size} bytes")
+    data = json.loads(file_path.read_text())
     report = RAGScanReport(**data)
 
     if format == "json":
@@ -139,7 +176,8 @@ def report(
         return
 
     if output:
-        Path(output).write_text(text)
+        safe_path = _validate_output_path(output)
+        _safe_write_text(safe_path, text)
         console.print(f"[green]Output saved to[/] {output}")
     else:
         print(text)
@@ -170,7 +208,8 @@ def policy(
     async def run() -> None:
         report = await scanner.scan(config)
         yaml_content = gen.to_mcpguard_yaml(report)
-        Path(output).write_text(yaml_content)
+        safe_path = _validate_output_path(output)
+        _safe_write_text(safe_path, yaml_content)
         console.print(f"[green]Policies saved to[/] {output}")
         console.print(f"[bold]Risk score:[/] {report.risk_score}/100 ({report.risk_category})")
         console.print(f"[bold]Rules generated:[/] {len(report.findings)}")

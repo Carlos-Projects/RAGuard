@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from raguard.models import RAGTargetConfig
 from raguard.targets.base import BaseTarget
@@ -18,22 +20,33 @@ class ChromaTarget(BaseTarget):
         self._client: Any = None
 
     async def connect(self) -> bool:
-        """Connect to ChromaDB."""
+        """Connect to ChromaDB with path safety checks."""
         try:
             import chromadb
 
-            if self.config.url.startswith("http"):
-                self._client = chromadb.HttpClient(
-                    host=self.config.url.replace("http://", "").replace("https://", "").split(":")[0],
-                    port=int(self.config.url.split(":")[-1]) if ":" in self.config.url else 8000,
-                )
+            url = self.config.url
+            if url.startswith("http://") or url.startswith("https://"):
+                parsed = urlparse(url)
+                host = parsed.hostname or "localhost"
+                port = parsed.port or 8000
+                self._client = chromadb.HttpClient(host=host, port=port)
             else:
-                self._client = chromadb.PersistentClient(path=self.config.url)
+                # Only allow relative paths for persistent client
+                path = Path(url)
+                if path.is_absolute():
+                    raise ValueError(
+                        "Absolute paths are not allowed for ChromaDB persistent client. "
+                        "Use a relative path or an HTTP URL."
+                    )
+                safe_path = Path.cwd() / path
+                self._client = chromadb.PersistentClient(path=str(safe_path))
             return True
         except ImportError:
             raise ImportError(
                 "chromadb is required for ChromaDB targets. Install with: pip install raguard-scanner[chroma]"
             )
+        except ValueError:
+            raise
         except Exception:
             return False
 
