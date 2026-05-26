@@ -81,10 +81,11 @@ select = ["E", "F", "I", "N", "W", "UP", "B"]
 ignore = ["E501", "B904"]
 
 [tool.mypy]
-ignore_errors = true
+ignore_errors = false
 python_version = "3.11"
-strict = false
+strict = true
 ignore_missing_imports = true
+exclude = ["tests/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

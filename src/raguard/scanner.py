@@ -64,7 +64,8 @@ class RAGuardScanner:
                 all_findings.extend(findings)
             except Exception as exc:
                 if self.settings.debug:
-                    print(f"[DEBUG] Detector {detector.name} failed: {exc}")
+                    # Log only the exception type, not the message (may contain secrets)
+                    print(f"[DEBUG] Detector {detector.name} failed: {type(exc).__name__}")
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
 

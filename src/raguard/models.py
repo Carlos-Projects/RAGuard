@@ -75,11 +75,11 @@ class RAGTargetConfig(BaseModel):
 
     type: TargetType = TargetType.GENERIC
     url: str = "http://localhost:8000"
-    api_key: str | None = None
+    api_key: str | None = Field(default=None, exclude=True)
     collection_name: str = "default"
     embedding_model: str = "text-embedding-ada-002"
-    context_window: int = 4096
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    context_window: int = Field(default=4096, ge=1, le=1048576)
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional target metadata")
 
 
 class RAGFinding(BaseModel):
@@ -90,12 +90,15 @@ class RAGFinding(BaseModel):
     attack_type: RAGAttackType
     severity: Severity
     confidence: Confidence
-    title: str
-    description: str = ""
-    recommendation: str = ""
-    target: str = ""
-    risk_score: int = 0
-    details: dict[str, Any] = Field(default_factory=dict)
+    title: str = Field(..., min_length=1, max_length=500)
+    description: str = Field(default="", max_length=5000)
+    recommendation: str = Field(default="", max_length=2000)
+    target: str = Field(default="", max_length=1024)
+    risk_score: int = Field(default=0, ge=0, le=100)
+    details: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional finding details (not rendered in HTML reports directly)",
+    )
     timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
     def model_post_init(self, __context: Any) -> None:
