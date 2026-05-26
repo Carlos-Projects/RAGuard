@@ -7,22 +7,20 @@ from mcp_taxonomy import (
     TaxonomyEvent,
 )
 from mcp_taxonomy import (
-    Confidence as TaxConfidence,
-)
-from mcp_taxonomy import (
     Severity as TaxSeverity,
 )
+from mcp_taxonomy import raguard_finding_to_taxonomy as canonical_normalize
 
 from raguard.models import RAGAttackType, RAGFinding, Severity
 
 # Mapping from RAG-specific attack types to canonical taxonomy categories
 ATTACK_TYPE_TO_CATEGORY: dict[RAGAttackType, AttackCategory] = {
-    RAGAttackType.DATA_POISONING: AttackCategory.TOOL_POISONING,
-    RAGAttackType.MEMBERSHIP_INFERENCE: AttackCategory.EXFILTRATION,
+    RAGAttackType.DATA_POISONING: AttackCategory.DATA_POISONING,
+    RAGAttackType.MEMBERSHIP_INFERENCE: AttackCategory.MEMBERSHIP_INFERENCE,
     RAGAttackType.PROMPT_LEAKAGE: AttackCategory.EXFILTRATION,
-    RAGAttackType.CONTEXT_OVERFLOW: AttackCategory.INJECTION,
-    RAGAttackType.RETRIEVAL_HIJACK: AttackCategory.INJECTION,
-    RAGAttackType.VECTOR_INJECTION: AttackCategory.INJECTION,
+    RAGAttackType.CONTEXT_OVERFLOW: AttackCategory.CONTEXT_OVERFLOW,
+    RAGAttackType.RETRIEVAL_HIJACK: AttackCategory.RETRIEVAL_HIJACK,
+    RAGAttackType.VECTOR_INJECTION: AttackCategory.VECTOR_INJECTION,
     RAGAttackType.POLICY_BYPASS: AttackCategory.POLICY_VIOLATION,
 }
 
@@ -49,36 +47,17 @@ RAG_DETECTION_METHODS: dict[RAGAttackType, str] = {
 
 def normalize_finding(finding: RAGFinding) -> TaxonomyEvent:
     """Convert a RAGuard RAGFinding to a normalized taxonomy TaxonomyEvent."""
-    return TaxonomyEvent(
-        source="raguard",
-        attack_category=ATTACK_TYPE_TO_CATEGORY.get(
-            finding.attack_type, AttackCategory.ANOMALY
-        ),
-        severity=SEVERITY_MAP.get(finding.severity, TaxSeverity.INFO),
-        confidence=_map_confidence(finding.confidence),
-        title=finding.title,
-        description=finding.description,
-        recommendation=finding.recommendation,
-        detection_method=RAG_DETECTION_METHODS.get(
-            finding.attack_type, finding.detector
-        ),
-        target=finding.target,
-        snippet=str(finding.details.get("snippet", ""))[:200],
-        raw=finding.details,
-        timestamp=finding.timestamp,
-        risk_score=finding.risk_score,
+    return canonical_normalize(
+        {
+            "attack_type": finding.attack_type.value if hasattr(finding.attack_type, "value") else finding.attack_type,
+            "detector": finding.detector,
+            "severity": finding.severity.value if hasattr(finding.severity, "value") else finding.severity,
+            "confidence": finding.confidence.value if hasattr(finding.confidence, "value") else finding.confidence,
+            "title": finding.title,
+            "description": finding.description,
+            "recommendation": finding.recommendation,
+            "snippet": str(finding.details.get("snippet", "")),
+            "target": finding.target,
+            "risk_score": finding.risk_score,
+        }
     )
-
-
-def _map_confidence(conf: Severity) -> TaxConfidence:
-    """Map RAGuard confidence to taxonomy confidence."""
-    from raguard.models import Confidence
-
-    mapping: dict[Confidence, TaxConfidence] = {
-        Confidence.CERTAIN: TaxConfidence.CERTAIN,
-        Confidence.HIGH: TaxConfidence.HIGH,
-        Confidence.MEDIUM: TaxConfidence.MEDIUM,
-        Confidence.LOW: TaxConfidence.LOW,
-        Confidence.NONE: TaxConfidence.NONE,
-    }
-    return mapping.get(conf, TaxConfidence.MEDIUM)
