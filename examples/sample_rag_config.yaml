@@ -1,0 +1,30 @@
+# Sample RAG Configuration for RAGuard
+# Use this as a template for scanning your RAG system
+
+target:
+  type: generic  # chroma, milvus, qdrant, generic
+  url: http://localhost:8000
+  api_key: ""  # Optional
+  collection_name: default
+  embedding_model: text-embedding-ada-002
+  context_window: 4096
+
+scan:
+  timeout: 30
+  max_retries: 3
+  concurrent_scans: 5
+
+detectors:
+  - data_poisoning
+  - membership_inference
+  - prompt_leakage
+  - context_overflow
+  - retrieval_hijack
+  - vector_injection
+  - policy_bypass
+
+output:
+  format: rich  # rich, json, html, sarif
+  file: null
+  ci_mode: false
+  ci_threshold: high  # low, medium, high, critical
