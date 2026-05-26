@@ -17,11 +17,11 @@ class TestTaxonomyMapping:
         for severity in Severity:
             assert severity in SEVERITY_MAP
 
-    def test_data_poisoning_maps_to_data_poisoning(self) -> None:
-        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.DATA_POISONING] == AttackCategory.DATA_POISONING
+    def test_data_poisoning_maps_to_tool_poisoning(self) -> None:
+        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.DATA_POISONING] == AttackCategory.TOOL_POISONING
 
-    def test_membership_inference_maps_to_membership_inference(self) -> None:
-        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.MEMBERSHIP_INFERENCE] == AttackCategory.MEMBERSHIP_INFERENCE
+    def test_membership_inference_maps_to_exfiltration(self) -> None:
+        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.MEMBERSHIP_INFERENCE] == AttackCategory.EXFILTRATION
 
     def test_prompt_leakage_maps_to_exfiltration(self) -> None:
         assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.PROMPT_LEAKAGE] == AttackCategory.EXFILTRATION
@@ -29,8 +29,8 @@ class TestTaxonomyMapping:
     def test_policy_bypass_maps_to_policy_violation(self) -> None:
         assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.POLICY_BYPASS] == AttackCategory.POLICY_VIOLATION
 
-    def test_context_overflow_maps_to_context_overflow(self) -> None:
-        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.CONTEXT_OVERFLOW] == AttackCategory.CONTEXT_OVERFLOW
+    def test_context_overflow_maps_to_injection(self) -> None:
+        assert ATTACK_TYPE_TO_CATEGORY[RAGAttackType.CONTEXT_OVERFLOW] == AttackCategory.INJECTION
 
 
 class TestNormalizeFinding:
@@ -49,7 +49,7 @@ class TestNormalizeFinding:
         event = normalize_finding(finding)
 
         assert event.source == "raguard"
-        assert event.attack_category == AttackCategory.DATA_POISONING
+        assert event.attack_category == AttackCategory.TOOL_POISONING
         assert event.severity == TaxSeverity.HIGH
         assert event.confidence == TaxConfidence.HIGH
         assert event.title == "Test finding"
