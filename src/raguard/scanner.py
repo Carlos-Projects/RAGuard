@@ -28,7 +28,7 @@ class RAGuardScanner:
         detectors: list[type[BaseDetector]] | None = None,
     ) -> None:
         self.settings = settings or RAGuardSettings()
-        self._detectors = detectors or []
+        self._detectors: list[type[BaseDetector]] = detectors if detectors is not None else []
         self._load_default_detectors()
 
     def _load_default_detectors(self) -> None:

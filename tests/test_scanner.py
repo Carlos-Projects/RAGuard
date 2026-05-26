@@ -66,8 +66,10 @@ class TestRAGuardScanner:
 
     def test_add_detector(self) -> None:
         scanner = RAGuardScanner(detectors=[])
+        before = len(scanner._detectors)
         scanner.add_detector(MockDetector)
-        assert len(scanner._detectors) == 1
+        assert len(scanner._detectors) == before + 1
+        assert scanner._detectors[-1] == MockDetector
 
     def test_clear_detectors(self) -> None:
         scanner = RAGuardScanner(detectors=[MockDetector])

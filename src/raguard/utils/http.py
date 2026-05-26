@@ -61,14 +61,10 @@ def validate_target_url(url: str) -> str:
         raise ValueError(f"URL targets internal host: {hostname}. RAGuard does not scan internal services by default.")
 
     # Block private IP ranges
-    try:
-        if _is_private_ip(hostname):
-            raise ValueError(
-                f"URL targets private IP range: {hostname}. RAGuard does not scan internal services by default."
-            )
-    except ValueError:
-        if not hostname:
-            raise ValueError("Invalid hostname in URL")
+    if _is_private_ip(hostname):
+        raise ValueError(
+            f"URL targets private IP range: {hostname}. RAGuard does not scan internal services by default."
+        )
 
     return url
 

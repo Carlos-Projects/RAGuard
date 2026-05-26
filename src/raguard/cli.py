@@ -93,8 +93,8 @@ def _validate_collection(name: str) -> str:
 
 
 def _validate_api_key(key: str | None) -> str | None:
-    if key is None:
-        return None
+    if key is None or key == "":
+        return key if key is None else ""
     if not ALLOWED_API_KEY_RE.match(key):
         raise ValueError("API key contains invalid characters. Use RAGUARD_API_KEY environment variable for security.")
     console.print(
@@ -128,18 +128,10 @@ def _get_api_key(cli_key: str | None) -> str | None:
 def _validate_output_path(output_path: str) -> Path:
     """Validate and return a safe output file path.
 
-    Prevents path traversal attacks. The resolved path must not escape
-    the current working directory via '..' components.
+    Prevents path traversal attacks via '..' components.
     """
     path = Path(output_path).resolve()
-    # Ensure no '..' traversal escaped the intended parent
-    # We don't require CWD containment (tmp dirs are valid)
-    # but we block writes to sensitive system paths
-    sensitive_prefixes = ["/etc/", "/dev/", "/proc/", "/sys/", "/bin/", "/sbin/", "/boot/"]
-    for prefix in sensitive_prefixes:
-        if str(path).startswith(prefix):
-            raise ValueError(f"Output path is in a sensitive system directory: {prefix}")
-    # Block paths that would traverse up with .. (already resolved above, but double-check)
+    # Block paths that would traverse up with ..
     if ".." in Path(output_path).parts:
         raise ValueError(f"Output path contains '..' traversal: {output_path}")
     return path
