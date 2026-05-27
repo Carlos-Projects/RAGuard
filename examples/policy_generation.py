@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from raguard import RAGuardScanner, RAGTargetConfig, TargetType
+from raguard import RAGTargetConfig, RAGuardScanner, TargetType
 from raguard.policies import PolicyGenerator
 
 
