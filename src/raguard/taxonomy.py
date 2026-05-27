@@ -18,12 +18,12 @@ from raguard.models import RAGAttackType, RAGFinding, Severity
 
 # Mapping from RAG-specific attack types to canonical taxonomy categories
 ATTACK_TYPE_TO_CATEGORY: dict[RAGAttackType, AttackCategory] = {
-    RAGAttackType.DATA_POISONING: AttackCategory.TOOL_POISONING,
-    RAGAttackType.MEMBERSHIP_INFERENCE: AttackCategory.EXFILTRATION,
+    RAGAttackType.DATA_POISONING: AttackCategory.DATA_POISONING,
+    RAGAttackType.MEMBERSHIP_INFERENCE: AttackCategory.MEMBERSHIP_INFERENCE,
     RAGAttackType.PROMPT_LEAKAGE: AttackCategory.EXFILTRATION,
-    RAGAttackType.CONTEXT_OVERFLOW: AttackCategory.INJECTION,
-    RAGAttackType.RETRIEVAL_HIJACK: AttackCategory.INJECTION,
-    RAGAttackType.VECTOR_INJECTION: AttackCategory.INJECTION,
+    RAGAttackType.CONTEXT_OVERFLOW: AttackCategory.CONTEXT_OVERFLOW,
+    RAGAttackType.RETRIEVAL_HIJACK: AttackCategory.RETRIEVAL_HIJACK,
+    RAGAttackType.VECTOR_INJECTION: AttackCategory.VECTOR_INJECTION,
     RAGAttackType.POLICY_BYPASS: AttackCategory.POLICY_VIOLATION,
 }
 

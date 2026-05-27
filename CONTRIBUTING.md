@@ -21,6 +21,11 @@ Thank you for your interest in contributing to RAGuard! This document provides g
    pip install -e ".[dev]"
    ```
 
+4. **Install pre-commit hooks (optional but recommended):**
+   ```bash
+   pre-commit install
+   ```
+
 ## Code Style
 
 - **Linting:** We use `ruff` for linting and formatting.

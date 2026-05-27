@@ -1,6 +1,5 @@
 """Tests for CLI validation functions."""
 
-
 import pytest
 
 from raguard.cli import (
