@@ -3,9 +3,9 @@ title: RAGuard
 message: If you use RAGuard in your research, please cite it.
 type: software
 authors:
-  - family-names: Rocha
+  - family-names: Carlos-Projects
     given-names: Carlos
-    email: carlos@carlosrocha.dev
+    email: Carlos@AIAgentObservatory.org
 repository-code: https://github.com/Carlos-Projects/RAGuard
 license: MIT
 version: 0.1.0

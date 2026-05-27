@@ -15,7 +15,7 @@ We take the security of RAGuard seriously. If you believe you have found a secur
 Instead, please report them via:
 
 1. **GitHub Security Advisories:** Go to the Security tab and create a private advisory.
-2. **Email:** Send an email to carlos@carlosrocha.dev with the subject "[RAGuard Security]".
+2. **Email:** Send an email to Carlos@AIAgentObservatory.org with the subject "[RAGuard Security]".
 
 Please include the following information:
 
