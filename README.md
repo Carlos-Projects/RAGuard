@@ -1,4 +1,11 @@
-# RAGuard 🔒
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo.svg">
+    <img src="docs/logo.svg" alt="RAGuard" width="120">
+  </picture>
+</p>
+
+# RAGuard
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Carlos-Projects/RAGuard/ci.yml?branch=main&logo=github)](https://github.com/Carlos-Projects/RAGuard/actions)
 [![PyPI version](https://img.shields.io/pypi/v/raguard-scanner?logo=pypi)](https://pypi.org/project/raguard-scanner/)
