@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: RAGuard
+message: If you use RAGuard in your research, please cite it.
+type: software
+authors:
+  - family-names: Rocha
+    given-names: Carlos
+    email: carlos@carlosrocha.dev
+repository-code: https://github.com/Carlos-Projects/RAGuard
+license: MIT
+version: 0.1.0
+date-released: 2026-05-26
+keywords:
+  - rag-security
+  - llm-security
+  - ai-safety
+  - vector-db
+  - prompt-injection
+  - data-poisoning

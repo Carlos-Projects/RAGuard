@@ -54,6 +54,8 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.10",
     "pre-commit>=3.7",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
 ]
 all = [
     "raguard-scanner[chroma,milvus,qdrant,dev]",
@@ -92,7 +94,7 @@ source = ["raguard"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]
-fail_under = 80
+fail_under = 90
 show_missing = true
 
 [tool.pytest.ini_options]

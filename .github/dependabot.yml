@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      test-deps:
+        patterns:
+          - pytest*
+      lint-deps:
+        patterns:
+          - ruff
+          - mypy
+      core-deps:
+        patterns:
+          - httpx
+          - pydantic*
+          - typer
+          - rich
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - ci

@@ -78,6 +78,7 @@ class RAGTargetConfig(BaseModel):
     api_key: str | None = Field(default=None, exclude=True)
     collection_name: str = "default"
     embedding_model: str = "text-embedding-ada-002"
+    embedding_dimension: int = 1536
     context_window: int = Field(default=4096, ge=1, le=1048576)
     metadata: dict[str, Any] = Field(default_factory=dict, description="Additional target metadata")
 

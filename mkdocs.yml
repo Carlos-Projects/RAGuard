@@ -1,0 +1,49 @@
+site_name: RAGuard
+site_description: Security scanner for Retrieval-Augmented Generation (RAG) systems
+site_url: https://carlos-projects.github.io/RAGuard
+repo_url: https://github.com/Carlos-Projects/RAGuard
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: teal
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - search.highlight
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - CLI Usage: usage.md
+  - Python API: api/index.md
+  - Architecture: architecture.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 3
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Carlos-Projects/RAGuard

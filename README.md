@@ -4,6 +4,11 @@
 [![PyPI version](https://img.shields.io/pypi/v/raguard-scanner?logo=pypi)](https://pypi.org/project/raguard-scanner/)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python)](https://python.org)
 [![License](https://img.shields.io/github/license/Carlos-Projects/RAGuard?logo=opensourceinitiative)](LICENSE)
+[![Coverage](https://img.shields.io/codecov/c/github/Carlos-Projects/RAGuard?logo=codecov)](https://codecov.io/gh/Carlos-Projects/RAGuard)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Carlos-Projects/RAGuard/codeql.yml?branch=main&label=CodeQL&logo=github)](https://github.com/Carlos-Projects/RAGuard/actions)
+[![Docs](https://img.shields.io/github/actions/workflow/status/Carlos-Projects/RAGuard/docs.yml?branch=main&label=Docs&logo=github)](https://carlos-projects.github.io/RAGuard)
+[![pre-commit.ci](https://img.shields.io/badge/pre--commit.ci-enabled-brightgreen?logo=pre-commit)](https://results.pre-commit.ci/latest/github/Carlos-Projects/RAGuard/main)
+[![Dependabot](https://img.shields.io/badge/dependabot-enabled-blue?logo=dependabot)](https://github.com/Carlos-Projects/RAGuard/network/updates)
 [![GitHub stars](https://img.shields.io/github/stars/Carlos-Projects/RAGuard?style=social)](https://github.com/Carlos-Projects/RAGuard)
 
 **Security scanner for Retrieval-Augmented Generation (RAG) systems.** Detect data poisoning, membership inference, prompt leakage, and 4 more attack vectors before they compromise your AI pipeline.
