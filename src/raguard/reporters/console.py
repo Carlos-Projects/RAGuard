@@ -12,6 +12,9 @@ from raguard.models import RAGScanReport, Severity
 class ConsoleReporter:
     """Rich console reporter for RAGuard scan results."""
 
+    def __init__(self, quiet: bool = False) -> None:
+        self.quiet = quiet
+
     def render(self, report: RAGScanReport) -> str:
         """Render scan report to Rich console output.
 
@@ -23,6 +26,12 @@ class ConsoleReporter:
         """
         console = Console()
         output_parts = []
+
+        if self.quiet:
+            if report.findings:
+                console.print(self._findings_table(report))
+                output_parts.append(f"{len(report.findings)} findings")
+            return "\n".join(output_parts)
 
         color_map = {
             "none": "green",
@@ -49,24 +58,27 @@ class ConsoleReporter:
             output_parts.append(report.summary)
 
         if report.findings:
-            table = Table(title=f"Findings ({len(report.findings)})")
-            table.add_column("Severity", style="bold")
-            table.add_column("Attack Type", style="cyan")
-            table.add_column("Title")
-            table.add_column("Detector")
-            table.add_column("Risk")
-
-            for f in report.findings:
-                sev_style = "red" if f.severity in (Severity.CRITICAL, Severity.HIGH) else "yellow"
-                table.add_row(
-                    f"[{sev_style}]{f.severity.value.upper()}[/{sev_style}]",
-                    f.attack_type.value,
-                    f.title[:50],
-                    f.detector,
-                    str(f.risk_score),
-                )
-
-            console.print(table)
+            console.print(self._findings_table(report))
             output_parts.append(f"{len(report.findings)} findings")
 
         return "\n".join(output_parts)
+
+    def _findings_table(self, report: RAGScanReport) -> Table:
+        table = Table(title=f"Findings ({len(report.findings)})")
+        table.add_column("Severity", style="bold")
+        table.add_column("Attack Type", style="cyan")
+        table.add_column("Title")
+        table.add_column("Detector")
+        table.add_column("Risk")
+
+        for finding in report.findings:
+            sev_style = "red" if finding.severity in (Severity.CRITICAL, Severity.HIGH) else "yellow"
+            table.add_row(
+                f"[{sev_style}]{finding.severity.value.upper()}[/{sev_style}]",
+                finding.attack_type.value,
+                finding.title[:50],
+                finding.detector,
+                str(finding.risk_score),
+            )
+
+        return table

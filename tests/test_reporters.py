@@ -132,3 +132,30 @@ class TestConsoleReporter:
         assert "RAGuard Scan Results" in output or "Scan Results" in output
         captured = capsys.readouterr()
         assert "Test finding" in captured.out
+
+    def test_quiet_render_prints_findings_only(self, capsys: pytest.CaptureFixture) -> None:
+        reporter = ConsoleReporter(quiet=True)
+        report = create_test_report()
+        output = reporter.render(report)
+
+        assert output == "2 findings"
+        captured = capsys.readouterr()
+        assert "Findings (2)" in captured.out
+        assert "Test finding" in captured.out
+        assert "RAGuard Scan Results" not in captured.out
+        assert "Summary" not in captured.out
+        assert "Risk Score" not in captured.out
+
+    def test_quiet_render_without_findings_prints_nothing(self, capsys: pytest.CaptureFixture) -> None:
+        reporter = ConsoleReporter(quiet=True)
+        report = RAGScanReport(
+            target_url="http://test.com",
+            target_type=TargetType.GENERIC,
+            findings=[],
+        )
+
+        output = reporter.render(report)
+
+        assert output == ""
+        captured = capsys.readouterr()
+        assert captured.out == ""
