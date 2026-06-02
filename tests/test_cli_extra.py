@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from raguard.cli import _safe_write_text, _validate_api_key, main
+from raguard.cli import _get_api_key, _safe_write_text, _validate_api_key, main
 
 
 class TestValidateApiKey:
@@ -21,10 +21,33 @@ class TestValidateApiKey:
         with pytest.raises(ValueError, match="API key contains invalid characters"):
             _validate_api_key("bad key!")
 
-    def test_valid_key_prints_warning(self) -> None:
+    def test_valid_key_validates_without_printing_warning(self) -> None:
         with patch("raguard.cli.console.print") as mock_print:
             result = _validate_api_key("valid-key-123")
             assert result == "valid-key-123"
+            mock_print.assert_not_called()
+
+
+class TestGetApiKey:
+    def test_cli_key_prints_warning(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("RAGUARD_API_KEY", raising=False)
+        with patch("raguard.cli.console.print") as mock_print:
+            result = _get_api_key("valid-key-123")
+            assert result == "valid-key-123"
+            mock_print.assert_called_once()
+
+    def test_quiet_cli_key_suppresses_warning(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("RAGUARD_API_KEY", raising=False)
+        with patch("raguard.cli.console.print") as mock_print:
+            result = _get_api_key("valid-key-123", quiet=True)
+            assert result == "valid-key-123"
+            mock_print.assert_not_called()
+
+    def test_env_key_wins_over_cli_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("RAGUARD_API_KEY", "env-key")
+        with patch("raguard.cli.console.print") as mock_print:
+            result = _get_api_key("cli-key")
+            assert result == "env-key"
             mock_print.assert_called_once()
 
 

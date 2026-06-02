@@ -14,6 +14,9 @@ raguard scan http://localhost:8000 --ci --threshold high
 
 # Select specific detectors
 raguard scan http://localhost:8000 --detectors "data_poisoning,prompt_leakage"
+
+# Quiet mode (only findings/errors)
+raguard scan http://localhost:8000 --quiet
 ```
 
 ## Report
@@ -42,6 +45,7 @@ raguard policy http://localhost:8000 --type qdrant -o policies.yaml
 | `--output` | Output file path (for json/html/sarif) | stdout |
 | `--threshold` | Minimum severity: low, medium, high, critical | medium |
 | `--ci` | Exit with code 1 if findings >= threshold | false |
+| `--quiet` | Suppress non-error output and print findings only | false |
 | `--detectors` | Comma-separated detector names | all |
 | `--api-key` | API key for the target | env or none |
 | `--collection` | Collection name for vector DBs | default |

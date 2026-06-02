@@ -97,11 +97,6 @@ def _validate_api_key(key: str | None) -> str | None:
         return key if key is None else ""
     if not ALLOWED_API_KEY_RE.match(key):
         raise ValueError("API key contains invalid characters. Use RAGUARD_API_KEY environment variable for security.")
-    console.print(
-        "[yellow]Warning:[/] API key passed via CLI argument. "
-        "This is visible in process listings. "
-        "Use the RAGUARD_API_KEY environment variable instead."
-    )
     return key
 
 
@@ -116,12 +111,19 @@ def _validate_detectors(detectors_str: str | None) -> str | None:
     return detectors_str
 
 
-def _get_api_key(cli_key: str | None) -> str | None:
+def _get_api_key(cli_key: str | None, quiet: bool = False) -> str | None:
     """Get API key from CLI arg or environment variable."""
     env_key = os.environ.get("RAGUARD_API_KEY")
     if cli_key and env_key:
-        console.print("[yellow]Warning:[/] Both --api-key and RAGUARD_API_KEY env var set. Using env var.")
+        if not quiet:
+            console.print("[yellow]Warning:[/] Both --api-key and RAGUARD_API_KEY env var set. Using env var.")
         return env_key
+    if cli_key and not quiet:
+        console.print(
+            "[yellow]Warning:[/] API key passed via CLI argument. "
+            "This is visible in process listings. "
+            "Use the RAGUARD_API_KEY environment variable instead."
+        )
     return cli_key or env_key
 
 
@@ -169,12 +171,13 @@ def scan(
         "high", "--threshold", help="CI failure threshold: low, medium, high, critical", callback=_validate_threshold
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress non-error output; print findings only"),
     detectors: str = typer.Option(
         None, "--detectors", "-d", help="Comma-separated list of detectors to run", callback=_validate_detectors
     ),
 ) -> None:
     """Scan a RAG system for security vulnerabilities."""
-    settings = RAGuardSettings(verbose=verbose, debug=verbose)
+    settings = RAGuardSettings(verbose=verbose and not quiet, debug=verbose and not quiet)
 
     target_type_map = {
         "chroma": TargetType.CHROMA,
@@ -183,7 +186,7 @@ def scan(
         "generic": TargetType.GENERIC,
     }
 
-    resolved_api_key = _get_api_key(api_key)
+    resolved_api_key = _get_api_key(api_key, quiet=quiet)
 
     config = RAGTargetConfig(
         url=target,
@@ -206,7 +209,7 @@ def scan(
 
         # Render output
         if fmt == "rich":
-            reporter = ConsoleReporter()
+            reporter = ConsoleReporter(quiet=quiet)
             reporter.render(report)
         elif fmt == "json":
             reporter = JSONReporter()
@@ -214,7 +217,8 @@ def scan(
             if output:
                 safe_path = _validate_output_path(output)
                 _safe_write_text(safe_path, text)
-                console.print(f"[green]Output saved to[/] {output}")
+                if not quiet:
+                    console.print(f"[green]Output saved to[/] {output}")
             else:
                 print(text)
         elif fmt == "html":
@@ -222,7 +226,8 @@ def scan(
             if output:
                 safe_path = _validate_output_path(output)
                 _safe_write_text(safe_path, reporter.render(report))
-                console.print(f"[green]HTML report saved to[/] {output}")
+                if not quiet:
+                    console.print(f"[green]HTML report saved to[/] {output}")
             else:
                 print(reporter.render(report))
         elif fmt == "sarif":
@@ -231,7 +236,8 @@ def scan(
             if output:
                 safe_path = _validate_output_path(output)
                 _safe_write_text(safe_path, text)
-                console.print(f"[green]SARIF report saved to[/] {output}")
+                if not quiet:
+                    console.print(f"[green]SARIF report saved to[/] {output}")
             else:
                 print(text)
         else:
@@ -246,7 +252,8 @@ def scan(
             if cat_val >= threshold_val:
                 console.print(f"[red]CI FAILED:[/] Risk {report.risk_category} >= threshold {threshold}")
                 raise typer.Exit(1)
-            console.print(f"[green]CI PASSED:[/] Risk {report.risk_category} < threshold {threshold}")
+            if not quiet:
+                console.print(f"[green]CI PASSED:[/] Risk {report.risk_category} < threshold {threshold}")
 
     asyncio.run(run_scan())
 

@@ -77,6 +77,9 @@ raguard scan http://localhost:8000 --type chroma --format json --output results.
 # CI mode (fails on high+ risk)
 raguard scan http://localhost:8000 --ci --threshold high
 
+# Quiet mode (only findings/errors)
+raguard scan http://localhost:8000 --quiet
+
 # Generate MCPGuard policies
 raguard policy http://localhost:8000 --type qdrant -o policies.yaml
 

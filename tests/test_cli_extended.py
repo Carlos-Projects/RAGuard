@@ -51,12 +51,42 @@ class TestCLIScanCommand:
         )
         assert result.exit_code == 0
 
+    def test_scan_with_quiet_flag(self) -> None:
+        result = runner.invoke(
+            app,
+            ["scan", "http://localhost:8000", "--quiet"],
+        )
+        assert result.exit_code == 0
+        assert "Findings" in result.stdout
+        assert "RAGuard Scan Results" not in result.stdout
+        assert "Risk Score" not in result.stdout
+        assert "Summary" not in result.stdout
+
+    def test_scan_quiet_with_output_file_suppresses_save_message(self, tmp_path: Path) -> None:
+        output_file = tmp_path / "results.json"
+        result = runner.invoke(
+            app,
+            ["scan", "http://localhost:8000", "--format", "json", "--quiet", "-o", str(output_file)],
+        )
+        assert result.exit_code == 0
+        assert output_file.exists()
+        assert result.stdout == ""
+
     def test_scan_with_api_key(self) -> None:
         result = runner.invoke(
             app,
             ["scan", "http://localhost:8000", "--api-key", "test-key"],
         )
         assert result.exit_code == 0
+
+    def test_scan_quiet_with_api_key_suppresses_warning(self) -> None:
+        result = runner.invoke(
+            app,
+            ["scan", "http://localhost:8000", "--quiet", "--api-key", "test-key"],
+        )
+        assert result.exit_code == 0
+        assert "Warning" not in result.stdout
+        assert "Findings" in result.stdout
 
     def test_scan_with_custom_collection(self) -> None:
         result = runner.invoke(
